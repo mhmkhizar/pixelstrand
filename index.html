@@ -187,8 +187,10 @@ async function buildProductionPDF(pattern,palette,meta={}){
  text(x,y+3,code.get(i),9,true);rect(x+20,y-7,12,12,rgb[i].map(v=>v/255));rect(x+20,y-7,12,12,[.7,.7,.7],true);
  text(x+39,y-1,palette[i][0],8,true);text(x+39,y+7,`PS-V1-${String(i+1)}  ${palette[i][1]}`,6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
  }
- text(36,760,'Chain 1 is the leftmost image column. Bead 1 is the BOTTOM pixel of each chain.',9,true);
- text(36,775,'Read each strip upward, then continue with the next strip. All 97 pages are A4.',9,false,muted);
+ const totalBeads=used.reduce((sum,i)=>sum+quantities[i],0),totalStrands=used.reduce((sum,i)=>sum+Math.ceil(quantities[i]/130),0);
+ text(36,757,`TOTAL BEADS: ${String(totalBeads).replace(/\B(?=(\d{3})+(?!\d))/g,',')}   /   TOTAL STRANDS: ${totalStrands}`,11,true,accent);
+ text(36,775,'Chain 1 is the leftmost image column. Bead 1 is the BOTTOM pixel of each chain.',9,true);
+ text(36,788,'Read each strip upward, then continue with the next strip. All 97 pages are A4.',9,false,muted);
  await finish(1);
  for(let chain=0;chain<W;chain++){
  text(36,35,'PIXELSTRAND / CHAIN GUIDE',10,true,accent);text(36,64,`Chain ${chain+1}`,25,true);
