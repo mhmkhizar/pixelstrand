@@ -29,7 +29,7 @@ const MODE_NOTES={"fs": "Fine, distributed texture. The default starting point."
 const MODE_NAMES={"fs": "Floyd\u2013Steinberg", "atkinson": "Atkinson", "jjn": "Jarvis\u2013Judice\u2013Ninke", "stucki": "Stucki", "burkes": "Burkes", "sierra": "Sierra", "sierra2": "Two-row Sierra", "sierralite": "Sierra Lite", "ordered": "Bayer 8 \u00d7 8", "ordered4": "Bayer 4 \u00d7 4", "ordered2": "Bayer 2 \u00d7 2", "hybridfs": "Bayer + Floyd\u2013Steinberg", "hybridstucki": "Bayer + Stucki", "mixed": "Floyd\u2013Steinberg + Stucki", "edge": "Edge-aware FS / Stucki", "none": "No dithering"};
 const $=id=>document.getElementById(id),W=96,H=144;
 const colors=PALETTE.map(([,h])=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
-const idFor=i=>'PS-V1-'+String(i+1);
+const idFor=i=>String(i+1);
 let basePixels=null,indices=null,counts=null,worker=null,job=0,loadVersion=0,debounce,filename='pixelstrand-pattern',sourceSize=[0,0],renderMeta=null,exporting=false;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').className='status '+(error?'error':'ok');};
 const setExports=enabled=>document.querySelectorAll('.export').forEach(b=>b.disabled=!enabled||exporting);
@@ -155,7 +155,8 @@ async function buildProductionPDF(pattern,palette,meta={}){
  const quantities=new Uint32Array(palette.length);for(const i of pattern){if(!rgb[i])throw Error('Invalid palette index');quantities[i]++;}
  const used=Array.from(quantities,(_,i)=>i).filter(i=>quantities[i]).sort((a,b)=>quantities[b]-quantities[a]||a-b);
  if(used.length>24)throw Error('Pattern exceeds the 24-color limit');
- const code=new Map(used.map((id,i)=>[id,String(i+1)]));
+ // Palette order defines permanent color codes; quantity only determines display order.
+ const code=new Map(used.map(id=>[id,String(id+1)]));
  const enc=new TextEncoder(),bytes=x=>typeof x==='string'?enc.encode(x):x;
  function join(parts){parts=parts.map(bytes);const out=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let at=0;for(const p of parts){out.set(p,at);at+=p.length;}return out;}
  const objects=[null],add=x=>(objects.push(bytes(x)),objects.length-1);
@@ -185,7 +186,7 @@ async function buildProductionPDF(pattern,palette,meta={}){
  for(const x of [36,302]){text(x,515,'CODE / COLOR',7,true,muted);text(x+170,515,'BEADS',7,true,muted);text(x+218,515,'STRANDS',7,true,muted);}
  for(let pos=0;pos<used.length;pos++){const i=used[pos],col=pos<half?0:1,row=pos%half,x=36+col*266,y=533+row*18;
  text(x,y+3,code.get(i),9,true);rect(x+20,y-7,12,12,rgb[i].map(v=>v/255));rect(x+20,y-7,12,12,[.7,.7,.7],true);
- text(x+39,y-1,palette[i][0],8,true);text(x+39,y+7,`PS-V1-${String(i+1)}  ${palette[i][1]}`,6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
+ text(x+39,y-1,palette[i][0],8,true);text(x+39,y+7,palette[i][1],6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
  }
  const totalBeads=used.reduce((sum,i)=>sum+quantities[i],0),totalStrands=used.reduce((sum,i)=>sum+Math.ceil(quantities[i]/130),0);
  text(36,757,`TOTAL BEADS: ${String(totalBeads).replace(/\B(?=(\d{3})+(?!\d))/g,',')}   /   TOTAL STRANDS: ${totalStrands}`,11,true,accent);
