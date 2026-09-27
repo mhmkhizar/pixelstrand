@@ -19,7 +19,7 @@ select{appearance:none;-webkit-appearance:none;padding:10px 42px 10px 12px;backg
 <div class="layout">
 <aside class="stack"><section class="panel"><h2>01 / Choose your image</h2><p style="font-size:12px;margin-bottom:18px">PNG, JPEG or WebP · any aspect ratio</p><label class="upload" id="drop"><span style="font-size:26px">＋</span><strong>Choose a photo</strong><small>or drop it here · automatic center crop</small><input id="file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Choose a photo"></label><div id="status" class="status" role="status" aria-live="polite">Any ratio is welcome. Your photo is centered and fitted to 1080 × 1350 before conversion.</div></section>
 <section class="panel"><h2>02 / Find your finish</h2><div class="control"><label for="mode">Color treatment</label><select id="mode" title="Floyd–Steinberg"><option value="fs">Floyd–Steinberg</option><option value="atkinson">Atkinson</option><option value="jjn">Jarvis–Judice–Ninke</option><option value="stucki">Stucki</option><option value="burkes">Burkes</option><option value="sierra">Sierra</option><option value="sierra2">Two-row Sierra</option><option value="sierralite">Sierra Lite</option><option value="ordered">Bayer 8 × 8</option><option value="ordered4">Bayer 4 × 4</option><option value="ordered2">Bayer 2 × 2</option><option value="hybridfs">Bayer + Floyd–Steinberg</option><option value="hybridstucki">Bayer + Stucki</option><option value="mixed">Floyd–Steinberg + Stucki</option><option value="edge">Edge-aware FS / Stucki</option><option value="none">No dithering</option></select></div><div class="control"><label for="strength">Dithering strength <output id="strengthValue">100%</output></label><input id="strength" type="range" min="0" max="100" value="100"></div><p class="mode-note" id="modeNote" aria-live="polite">Fine, distributed texture. The default starting point.</p><button class="quiet" id="reset">Reset dithering</button><p style="font-size:12px">Compare textures in the real-world preview. Every mode uses at most 24 colors. A limited palette cannot reproduce every source color exactly.</p></section></aside>
-<div class="stack"><section class="panel"><div class="preview-head"><h2>03 / Preview & export</h2><span class="pill" id="badge">96 × 144 · 13,824 beads</span></div><div class="previews"><div><div class="caption"><span>Prepared photo</span><span id="dimensions">1080 × 1350</span></div><div class="stage" id="sourceStage"><canvas id="source" aria-label="Center-cropped and resized input photo"></canvas><div class="empty"><div class="icon">▧</div>Your photo goes here</div></div></div><div><div class="caption"><span>Bead pattern</span><span id="used">30-color palette</span></div><div class="stage" id="resultStage"><canvas id="result" width="96" height="144" aria-label="Converted 96 by 144 bead pattern"></canvas><div class="empty"><div class="icon">▦</div>Every square is one bead</div></div></div><div><div class="caption"><span>Real-world proportions</span><span>1152 × 1440</span></div><div class="stage" id="physicalStage"><canvas id="physical" width="1152" height="1440" aria-label="Bead artwork stretched horizontally to real-world 4 by 5 proportions"></canvas><div class="empty"><div class="icon">▧</div>Wider beads, restored proportions</div></div><p class="preview-note">4:5 view · each bead shown 20% wider</p></div></div><div class="downloads"><button class="button export" id="download" disabled>↓ Download A4 production PDF</button><button class="button secondary export" id="patternPNG" disabled>↓ Bead pattern PNG · 960 × 1440</button><button class="button secondary export" id="physicalPNG" disabled>↓ Real-world PNG · 1152 × 1440</button></div><p class="detail" id="verification">Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 chain guides. Every page is A4.</p></section>
+<div class="stack"><section class="panel"><div class="preview-head"><h2>03 / Preview & export</h2><span class="pill" id="badge">96 × 144 · 13,824 beads</span></div><div class="previews"><div><div class="caption"><span>Prepared photo</span><span id="dimensions">1080 × 1350</span></div><div class="stage" id="sourceStage"><canvas id="source" aria-label="Center-cropped and resized input photo"></canvas><div class="empty"><div class="icon">▧</div>Your photo goes here</div></div></div><div><div class="caption"><span>Bead pattern</span><span id="used">30-color palette</span></div><div class="stage" id="resultStage"><canvas id="result" width="96" height="144" aria-label="Converted 96 by 144 bead pattern"></canvas><div class="empty"><div class="icon">▦</div>Every square is one bead</div></div></div><div><div class="caption"><span>Real-world proportions</span><span>1152 × 1440</span></div><div class="stage" id="physicalStage"><canvas id="physical" width="1152" height="1440" aria-label="Bead artwork stretched horizontally to real-world 4 by 5 proportions"></canvas><div class="empty"><div class="icon">▧</div>Wider beads, restored proportions</div></div><p class="preview-note">4:5 view · each bead shown 20% wider</p></div></div><div class="downloads"><button class="button export" id="download" disabled>↓ Download A4 production PDF</button><button class="button secondary export" id="patternPNG" disabled>↓ Bead pattern PNG · 960 × 1440</button><button class="button secondary export" id="physicalPNG" disabled>↓ Real-world PNG · 1152 × 1440</button></div><p class="detail" id="verification">Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 necklace guides. Every page is A4.</p></section>
 </div></div>
 </main><footer><strong class="footer-credit">Created by Muhammad Khizar with GPT Astra 6</strong><span>PixelStrand · Works offline · Your photos stay on your device</span></footer>
 <script>
@@ -33,7 +33,7 @@ const idFor=i=>String(i+1);
 let basePixels=null,indices=null,counts=null,worker=null,job=0,loadVersion=0,debounce,filename='pixelstrand-pattern',sourceSize=[0,0],renderMeta=null,exporting=false;
 const status=(text,error=false)=>{$('status').textContent=text;$('status').className='status '+(error?'error':'ok');};
 const setExports=enabled=>document.querySelectorAll('.export').forEach(b=>b.disabled=!enabled||exporting);
-function invalidate(){job++;if(worker){worker.terminate();worker=null;}clearTimeout(debounce);debounce=null;renderMeta=null;basePixels=null;indices=null;counts=null;setExports(false);$('sourceStage').classList.remove('ready');$('resultStage').classList.remove('ready');$('physicalStage').classList.remove('ready');$('dimensions').textContent='1080 × 1350';$('used').textContent='30-color palette';$('badge').textContent='96 × 144 · 13,824 beads';$('verification').textContent='Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 chain guides. Every page is A4.';}
+function invalidate(){job++;if(worker){worker.terminate();worker=null;}clearTimeout(debounce);debounce=null;renderMeta=null;basePixels=null;indices=null;counts=null;setExports(false);$('sourceStage').classList.remove('ready');$('resultStage').classList.remove('ready');$('physicalStage').classList.remove('ready');$('dimensions').textContent='1080 × 1350';$('used').textContent='30-color palette';$('badge').textContent='96 × 144 · 13,824 beads';$('verification').textContent='Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 necklace guides. Every page is A4.';}
 function centerCropRect(w,h){if(w/h>4/5){const width=h*4/5;return {x:(w-width)/2,y:0,width,height:h};}const height=w*5/4;return {x:0,y:(h-height)/2,width:w,height};}
 async function acceptFile(file){const version=++loadVersion;invalidate();if(!file)return;
  if(!['image/png','image/jpeg','image/webp'].includes(file.type)){status('Please choose a PNG, JPEG or WebP image.',true);return;}
@@ -146,7 +146,7 @@ function downloadPreview(width,height,label){
 }
 $('patternPNG').onclick=()=>downloadPreview(960,1440,'bead-pattern');
 $('physicalPNG').onclick=()=>downloadPreview(1152,1440,'real-world');
-// Self-contained PDF 1.4 exporter. Text and chain cells are vectors; the cover
+// Self-contained PDF 1.4 exporter. Text and necklace cells are vectors; the cover
 // contains a lossless 960 x 1440 RGB image, with interpolation explicitly disabled.
 async function buildProductionPDF(pattern,palette,meta={}){
  const W=96,H=144,N=W*H;
@@ -176,40 +176,40 @@ async function buildProductionPDF(pattern,palette,meta={}){
  text(36,35,'PIXELSTRAND',12,true,accent);text(36,60,'Your portrait, bead by bead.',24,true);
  // The preview comes before the production details and color inventory.
  commands.push(`q 192 0 0 288 201.638 ${num(PH-80-288)} cm /Preview Do Q`);
- text(36,392,'96 CHAINS  /  144 BEADS PER CHAIN  /  13,824 TOTAL BEADS',11,true);
+ text(36,392,'96 NECKLACES  /  144 BEADS PER NECKLACE  /  13,824 TOTAL BEADS',11,true);
  text(36,410,`${used.length} used colors / 24 maximum / PixelStrand V1 (30-color source palette)`,10,false,muted);
  text(36,426,'Source: '+String(meta.name||'Image').replace(/[^\x20-\x7E]/g,'?').slice(0,77),9,false,muted);
  text(36,442,`${meta.width||'?'} x ${meta.height||'?'} -> ${meta.width*5===meta.height*4?'resize':'center crop'} 1080 x 1350 -> 900 x 1350 -> 96 x 144`,9,false,muted);
  text(36,458,`${meta.mode||'Floyd-Steinberg'} / strength ${meta.strength??100}% / preview 960 x 1440 px`,9,false,muted);
  text(36,483,'Color key',15,true);text(36,499,'1 strand = 130 beads. Buy whole strands, rounded up separately for each color.',8.5,false,muted);
  const half=Math.ceil(used.length/2);
- for(const x of [36,302]){text(x,515,'CODE / COLOR',7,true,muted);text(x+170,515,'BEADS',7,true,muted);text(x+218,515,'STRANDS',7,true,muted);}
+ for(const x of [36,302]){text(x,515,'S.',7,true,muted);text(x+39,515,'COLOR (CODE)',7,true,muted);text(x+170,515,'BEADS',7,true,muted);text(x+218,515,'STRANDS',7,true,muted);}
  for(let pos=0;pos<used.length;pos++){const i=used[pos],col=pos<half?0:1,row=pos%half,x=36+col*266,y=533+row*18;
- text(x,y+3,code.get(i),9,true);rect(x+20,y-7,12,12,rgb[i].map(v=>v/255));rect(x+20,y-7,12,12,[.7,.7,.7],true);
- text(x+39,y-1,palette[i][0],8,true);text(x+39,y+7,palette[i][1],6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
+ text(x,y+3,String(pos+1),9,true);rect(x+20,y-7,12,12,rgb[i].map(v=>v/255));rect(x+20,y-7,12,12,[.7,.7,.7],true);
+ text(x+39,y-1,`${palette[i][0]} (${code.get(i)})`,8,true);text(x+39,y+7,palette[i][1],6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
  }
  const totalBeads=used.reduce((sum,i)=>sum+quantities[i],0),totalStrands=used.reduce((sum,i)=>sum+Math.ceil(quantities[i]/130),0);
  text(36,757,`TOTAL BEADS: ${String(totalBeads).replace(/\B(?=(\d{3})+(?!\d))/g,',')}   /   TOTAL STRANDS: ${totalStrands}`,11,true,accent);
- text(36,775,'Chain 1 is the leftmost image column. Bead 1 is the BOTTOM pixel of each chain.',9,true);
+ text(36,775,'Necklace 1 is the leftmost image column. Bead 1 is the BOTTOM pixel of each necklace.',9,true);
  text(36,788,'Read each strip upward, then continue with the next strip. All 97 pages are A4.',9,false,muted);
  await finish(1);
- for(let chain=0;chain<W;chain++){
- text(36,35,'PIXELSTRAND / CHAIN GUIDE',10,true,accent);text(36,64,`Chain ${chain+1}`,25,true);
- text(36,86,`Column ${chain+1} of 96, counted from the left. 144 beads total.`,11,false,muted);
+ for(let necklace=0;necklace<W;necklace++){
+ text(36,35,'PIXELSTRAND / NECKLACE GUIDE',10,true,accent);text(36,64,`Necklace ${necklace+1}`,25,true);
+ text(36,86,`Column ${necklace+1} of 96, counted from the left. 144 beads total.`,11,false,muted);
  text(36,105,'Start at bead 1 at the bottom of strip 1. Read UP, then move to the next strip.',9,false,muted);
  text(36,122,'Numbers INSIDE boxes are color codes; numbers beside boxes are bead positions.',9,false,muted);
  for(let part=0;part<3;part++){
  const x=48+part*177,start=part*48+1,end=(part+1)*48;
  text(x,151,`STRIP ${part+1} / BEADS ${start}-${end}`,10,true);text(x,166,'Read upward',8,false,accent);
  for(let k=0;k<48;k++){
- const bead=start+k,y=701-k*10.8,paletteIndex=pattern[(H-bead)*W+chain],col=rgb[paletteIndex].map(v=>v/255),luminance=.2126*col[0]+.7152*col[1]+.0722*col[2];
+ const bead=start+k,y=701-k*10.8,paletteIndex=pattern[(H-bead)*W+necklace],col=rgb[paletteIndex].map(v=>v/255),luminance=.2126*col[0]+.7152*col[1]+.0722*col[2];
  text(x+3,y+8,String(bead),7.5,false,muted);rect(x+37,y,51,10.8,col);rect(x+37,y,51,10.8,[.5,.55,.55],true);text(x+55,y+8,code.get(paletteIndex),8,true,luminance>.5?[0,0,0]:[1,1,1]);
  }
  text(x+3,732,part===0?'START HERE: BEAD 1':`CONTINUE: BEAD ${start}`,8,true,accent);
  }
  text(36,762,'Color key: page 1. Complete strips 1, 2, 3 in order; do not reverse or mirror.',9,false,muted);
  text(36,777,'Print on A4 at 100%. Diagram is an assembly guide, not a physical bead-size template.',8.5,false,muted);
- await finish(chain+2);
+ await finish(necklace+2);
  }
  objects[catalog]=bytes(`<< /Type /Catalog /Pages ${pagesRoot} 0 R >>`);objects[pagesRoot]=bytes(`<< /Type /Pages /Kids [${pageIds.map(n=>n+' 0 R').join(' ')}] /Count ${pageIds.length} >>`);
  const parts=[bytes('%PDF-1.4\n%PixelStrand\n')],offsets=[0];let length=parts[0].length;
