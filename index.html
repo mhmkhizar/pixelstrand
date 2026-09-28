@@ -194,7 +194,7 @@ async function buildProductionPDF(pattern,palette,meta={}){
  text(36,788,'Read each strip upward, then continue with the next strip. All 97 pages are A4.',9,false,muted);
  await finish(1);
  for(let necklace=0;necklace<W;necklace++){
- text(36,35,'PIXELSTRAND / NECKLACE GUIDE',10,true,accent);text(36,64,`Necklace ${necklace+1}`,25,true);
+ text(36,35,'PIXELSTRAND / NECKLACE GUIDE',10,true,accent);text(36,64,`Necklace ${String(necklace+1).padStart(2,'0')}`,25,true);
  text(36,86,`Column ${necklace+1} of 96, counted from the left. 144 beads total.`,11,false,muted);
  text(36,105,'Start at bead 1 at the bottom of strip 1. Read UP, then move to the next strip.',9,false,muted);
  text(36,122,'Numbers INSIDE boxes are color codes; numbers beside boxes are bead positions.',9,false,muted);
