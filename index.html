@@ -176,7 +176,7 @@ async function buildProductionPDF(pattern,palette,meta={}){
  text(36,35,'PIXELSTRAND',12,true,accent);text(36,60,'Your portrait, bead by bead.',24,true);
  // The preview comes before the production details and color inventory.
  commands.push(`q 192 0 0 288 201.638 ${num(PH-80-288)} cm /Preview Do Q`);
- text(36,392,'96 NECKLACES  /  144 BEADS PER NECKLACE  /  13,824 TOTAL BEADS',11,true);
+ text(36,392,'96 NECKLACES  /  144 ART + 4 NUMBER BEADS EACH = 148 BEADS',10,true);
  text(36,410,`${used.length} used colors / 24 maximum / PixelStrand V1 (30-color source palette)`,10,false,muted);
  text(36,426,'Source: '+String(meta.name||'Image').replace(/[^\x20-\x7E]/g,'?').slice(0,77),9,false,muted);
  text(36,442,`${meta.width||'?'} x ${meta.height||'?'} -> ${meta.width*5===meta.height*4?'resize':'center crop'} 1080 x 1350 -> 900 x 1350 -> 96 x 144`,9,false,muted);
@@ -184,31 +184,47 @@ async function buildProductionPDF(pattern,palette,meta={}){
  text(36,483,'Color key',15,true);text(36,499,'1 strand = 130 beads. Buy whole strands, rounded up separately for each color.',8.5,false,muted);
  const half=Math.ceil(used.length/2);
  for(const x of [36,302]){text(x,515,'S.',7,true,muted);text(x+39,515,'COLOR (CODE)',7,true,muted);text(x+170,515,'BEADS',7,true,muted);text(x+218,515,'STRANDS',7,true,muted);}
- for(let pos=0;pos<used.length;pos++){const i=used[pos],col=pos<half?0:1,row=pos%half,x=36+col*266,y=533+row*18;
+ for(let pos=0;pos<used.length;pos++){const i=used[pos],col=pos<half?0:1,row=pos%half,x=36+col*266,y=530+row*16.5;
  text(x,y+3,String(pos+1),9,true);rect(x+20,y-7,12,12,rgb[i].map(v=>v/255));rect(x+20,y-7,12,12,[.7,.7,.7],true);
  text(x+39,y-1,`${palette[i][0]} (${code.get(i)})`,8,true);text(x+39,y+7,palette[i][1],6.5,false,muted);text(x+170,y+3,String(quantities[i]).replace(/\B(?=(\d{3})+(?!\d))/g,','),9);text(x+225,y+3,String(Math.ceil(quantities[i]/130)),9,true);line(x,y+10,x+251,y+10);
  }
  const totalBeads=used.reduce((sum,i)=>sum+quantities[i],0),totalStrands=used.reduce((sum,i)=>sum+Math.ceil(quantities[i]/130),0);
- text(36,757,`TOTAL BEADS: ${String(totalBeads).replace(/\B(?=(\d{3})+(?!\d))/g,',')}   /   TOTAL STRANDS: ${totalStrands}`,11,true,accent);
- text(36,775,'Necklace 1 is the leftmost image column. Bead 1 is the BOTTOM pixel of each necklace.',9,true);
- text(36,788,'Read each strip upward, then continue with the next strip. All 97 pages are A4.',9,false,muted);
+ const numberBeadCounts=Array(10).fill(0);
+ for(let n=1;n<=W;n++)for(const digit of String(n).padStart(2,'0'))numberBeadCounts[Number(digit)]+=2;
+ text(36,735,`ART BEADS: 13,824 / ART STRANDS: ${totalStrands} / NUMBER BEADS: 384`,10,true,accent);
+ text(36,750,'TOTAL BEADS: 14,208. Number beads are separate from palette colors and art strands.',9,true);
+ text(36,764,'Number beads by digit: '+numberBeadCounts.map((count,digit)=>`${digit}: ${count}`).join(' / '),8,false,muted);
+ text(36,779,'Necklace 01 is the leftmost column. Bead 3 is the bottom image pixel.',9,true);
+ text(36,791,'Both end labels read bottom to top; digits tilt 90 degrees anticlockwise. Positions run 1-148.',8,false,muted);
  await finish(1);
  for(let necklace=0;necklace<W;necklace++){
  text(36,35,'PIXELSTRAND / NECKLACE GUIDE',10,true,accent);text(36,64,`Necklace ${String(necklace+1).padStart(2,'0')}`,25,true);
- text(36,86,`Column ${necklace+1} of 96, counted from the left. 144 beads total.`,11,false,muted);
- text(36,105,'Start at bead 1 at the bottom of strip 1. Read UP, then move to the next strip.',9,false,muted);
- text(36,122,'Numbers INSIDE boxes are color codes; numbers beside boxes are bead positions.',9,false,muted);
+ text(36,86,`Column ${necklace+1} of 96, counted from the left. 144 art + 4 number beads = 148 total.`,11,false,muted);
+ text(36,105,'Start at the bottom number beads in strip 1. Read UP through strips 1, 2, then 3.',9,false,muted);
+ text(36,122,'Art boxes show color codes; side numbers are positions 1-148. End boxes show necklace digits.',9,false,muted);
  for(let part=0;part<3;part++){
  const x=48+part*177,start=part*48+1,end=(part+1)*48;
- text(x,151,`STRIP ${part+1} / BEADS ${start}-${end}`,10,true);text(x,166,'Read upward',8,false,accent);
+ text(x,151,`STRIP ${part+1} / BEADS ${part===0?1:start+2}-${part===2?148:end+2}`,10,true);text(x,166,'Read upward',8,false,accent);
  for(let k=0;k<48;k++){
- const bead=start+k,y=701-k*10.8,paletteIndex=pattern[(H-bead)*W+necklace],col=rgb[paletteIndex].map(v=>v/255),luminance=.2126*col[0]+.7152*col[1]+.0722*col[2];
- text(x+3,y+8,String(bead),7.5,false,muted);rect(x+37,y,51,10.8,col);rect(x+37,y,51,10.8,[.5,.55,.55],true);text(x+55,y+8,code.get(paletteIndex),8,true,luminance>.5?[0,0,0]:[1,1,1]);
+ const bead=start+k,y=690-k*10,paletteIndex=pattern[(H-bead)*W+necklace],col=rgb[paletteIndex].map(v=>v/255),luminance=.2126*col[0]+.7152*col[1]+.0722*col[2];
+ text(x+3,y+8,String(bead+2),7.5,false,muted);rect(x+37,y,51,10,col);rect(x+37,y,51,10,[.5,.55,.55],true);text(x+62.5-code.get(paletteIndex).length*2.224,y+8,code.get(paletteIndex),8,true,luminance>.5?[0,0,0]:[1,1,1]);
  }
- text(x+3,732,part===0?'START HERE: BEAD 1':`CONTINUE: BEAD ${start}`,8,true,accent);
+ // Read both pairs bottom-up: tens first, then units. Digits rotate 90 degrees anticlockwise.
+ if(part===0||part===2){
+ const digits=String(necklace+1).padStart(2,'0'),top=part===0?700:200;
+ for(let d=0;d<2;d++){
+ const y=top+(1-d)*10,position=(part===0?1:147)+d;
+ rect(x+37,y,51,10,[.88,.89,.87]);rect(x+37,y,51,10,[.5,.55,.55],true);
+ text(x+3,y+8,String(position),7.5,false,muted);
+ // Center the rotated Helvetica-Bold digit within its bead box.
+ commands.push(`0 0 0 rg BT /FB 8 Tf 0 1 -1 0 ${num(x+65.372)} ${num(PH-y-7.224)} Tm (${digits[d]}) Tj ET`);
  }
- text(36,762,'Color key: page 1. Complete strips 1, 2, 3 in order; do not reverse or mirror.',9,false,muted);
- text(36,777,'Print on A4 at 100%. Diagram is an assembly guide, not a physical bead-size template.',8.5,false,muted);
+ text(x+94,top+7,part===0?'BOTTOM ID':'TOP ID',7,true,accent);
+ }
+ text(x+3,740,part===0?'START: BEAD 1':`CONTINUE: BEAD ${start+2}`,8,true,accent);
+ }
+ text(36,762,'Read UP: ID tens, units (1-2); art (3-146); ID tens, units (147-148).',9,false,muted);
+ text(36,777,'Off-white end boxes are physical number beads, NOT palette codes. Print on A4 at 100%.',8.5,false,muted);
  await finish(necklace+2);
  }
  objects[catalog]=bytes(`<< /Type /Catalog /Pages ${pagesRoot} 0 R >>`);objects[pagesRoot]=bytes(`<< /Type /Pages /Kids [${pageIds.map(n=>n+' 0 R').join(' ')}] /Count ${pageIds.length} >>`);
