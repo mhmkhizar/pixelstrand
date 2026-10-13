@@ -19,7 +19,7 @@ select{appearance:none;-webkit-appearance:none;padding:10px 42px 10px 12px;backg
 <div class="layout">
 <aside class="stack"><section class="panel"><h2>01 / Choose your image</h2><p style="font-size:12px;margin-bottom:18px">PNG, JPEG or WebP · any aspect ratio</p><label class="upload" id="drop"><span style="font-size:26px">＋</span><strong>Choose a photo</strong><small>or drop it here · automatic center crop</small><input id="file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Choose a photo"></label><div id="status" class="status" role="status" aria-live="polite">Any ratio is welcome. Your photo is centered and fitted to 1080 × 1350 before conversion.</div></section>
 <section class="panel"><h2>02 / Find your finish</h2><div class="control"><label for="mode">Color treatment</label><select id="mode" title="Floyd–Steinberg"><option value="fs">Floyd–Steinberg</option><option value="atkinson">Atkinson</option><option value="jjn">Jarvis–Judice–Ninke</option><option value="stucki">Stucki</option><option value="burkes">Burkes</option><option value="sierra">Sierra</option><option value="sierra2">Two-row Sierra</option><option value="sierralite">Sierra Lite</option><option value="ordered">Bayer 8 × 8</option><option value="ordered4">Bayer 4 × 4</option><option value="ordered2">Bayer 2 × 2</option><option value="hybridfs">Bayer + Floyd–Steinberg</option><option value="hybridstucki">Bayer + Stucki</option><option value="mixed">Floyd–Steinberg + Stucki</option><option value="edge">Edge-aware FS / Stucki</option><option value="none">No dithering</option></select></div><div class="control"><label for="strength">Dithering strength <output id="strengthValue">100%</output></label><input id="strength" type="range" min="0" max="100" value="100"></div><p class="mode-note" id="modeNote" aria-live="polite">Fine, distributed texture. The default starting point.</p><button class="quiet" id="reset">Reset dithering</button><p style="font-size:12px">Compare textures in the real-world preview. Every mode uses at most 24 colors. A limited palette cannot reproduce every source color exactly.</p></section></aside>
-<div class="stack"><section class="panel"><div class="preview-head"><h2>03 / Preview & export</h2><span class="pill" id="badge">96 × 144 · 13,824 beads</span></div><div class="previews"><div><div class="caption"><span>Prepared photo</span><span id="dimensions">1080 × 1350</span></div><div class="stage" id="sourceStage"><canvas id="source" aria-label="Center-cropped and resized input photo"></canvas><div class="empty"><div class="icon">▧</div>Your photo goes here</div></div></div><div><div class="caption"><span>Bead pattern</span><span id="used">30-color palette</span></div><div class="stage" id="resultStage"><canvas id="result" width="96" height="144" aria-label="Converted 96 by 144 bead pattern"></canvas><div class="empty"><div class="icon">▦</div>Every square is one bead</div></div></div><div><div class="caption"><span>Real-world proportions</span><span>1152 × 1440</span></div><div class="stage" id="physicalStage"><canvas id="physical" width="1152" height="1440" aria-label="Bead artwork stretched horizontally to real-world 4 by 5 proportions"></canvas><div class="empty"><div class="icon">▧</div>Wider beads, restored proportions</div></div><p class="preview-note">4:5 view · each bead shown 20% wider</p></div></div><div class="downloads"><button class="button export" id="download" disabled>↓ Download A4 production PDF</button><button class="button secondary export" id="patternPNG" disabled>↓ Bead pattern PNG · 960 × 1440</button><button class="button secondary export" id="physicalPNG" disabled>↓ Real-world PNG · 1152 × 1440</button></div><p class="detail" id="verification">Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 necklace guides. Every page is A4.</p></section>
+<div class="stack"><section class="panel"><div class="preview-head"><h2>03 / Preview & export</h2><span class="pill" id="badge">96 × 144 · 13,824 beads</span></div><div class="previews"><div><div class="caption"><span>Prepared photo</span><span id="dimensions">1080 × 1350</span></div><div class="stage" id="sourceStage"><canvas id="source" aria-label="Center-cropped and resized input photo"></canvas><div class="empty"><div class="icon">▧</div>Your photo goes here</div></div></div><div><div class="caption"><span>Bead pattern</span><span id="used">30-color palette</span></div><div class="stage" id="resultStage"><canvas id="result" width="96" height="144" aria-label="Converted 96 by 144 bead pattern"></canvas><div class="empty"><div class="icon">▦</div>Every square is one bead</div></div></div><div><div class="caption"><span>Real-world proportions</span><span>1152 × 1440</span></div><div class="stage" id="physicalStage"><canvas id="physical" width="1152" height="1440" aria-label="Bead artwork stretched horizontally to real-world 4 by 5 proportions"></canvas><div class="empty"><div class="icon">▧</div>Wider beads, restored proportions</div></div><p class="preview-note">4:5 view · each bead shown 20% wider</p></div></div><div class="downloads"><button class="button export" id="download" disabled>↓ Download A4 production PDF</button><button class="button secondary export" id="checkingPDF" disabled>↓ Full-size checking PDF · 9 A4 tiles</button><button class="button secondary export" id="patternPNG" disabled>↓ Bead pattern PNG · 960 × 1440</button><button class="button secondary export" id="physicalPNG" disabled>↓ Real-world PNG · 1152 × 1440</button></div><p class="detail">Full-size checking PDF: 6 mm wide × 5 mm tall beads, including end numbers. Print A4 at 100% / Actual Size, without Fit or Shrink. Arrange pages 1–3 / 4–6 / 7–9. Trim margins at the outer grid edges and tape together. Every bead box is complete; page numbers appear in the bottom margin.</p><p class="detail" id="verification">Exports use only the 30 palette colors. One PDF: a 960 × 1440 preview, used-color key, quantities and 96 necklace guides. Every page is A4.</p></section>
 </div></div>
 </main><footer><strong class="footer-credit">Created by Muhammad Khizar with GPT Astra 6</strong><span>PixelStrand · Works offline · Your photos stay on your device</span></footer>
 <script>
@@ -233,6 +233,60 @@ async function buildProductionPDF(pattern,palette,meta={}){
  const xref=length;parts.push(bytes(`xref\n0 ${objects.length}\n0000000000 65535 f \n`+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objects.length} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
  return new Blob(parts,{type:'application/pdf'});
 }
+
+// Full-size vector checking template: 6 mm wide x 5 mm tall per physical bead.
+// Nine A4 pages with margins, whole bead cells, and centered page numbers.
+async function buildCheckingPDF(pattern,palette,meta={}){
+ if(pattern.length!==96*144)throw Error('Invalid pattern dimensions');
+ const rgb=palette.map(([,hex])=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));
+ for(const id of pattern)if(!rgb[id])throw Error('Invalid palette index');
+ const mm=72/25.4,PW=210*mm,PH=297*mm,enc=new TextEncoder();
+ const bytes=x=>typeof x==='string'?enc.encode(x):x;
+ const join=parts=>{parts=parts.map(bytes);const out=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let at=0;for(const p of parts){out.set(p,at);at+=p.length;}return out;};
+ const objects=[null],add=x=>(objects.push(bytes(x)),objects.length-1),catalog=add(''),root=add('');
+ const font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'),bold=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'),pages=[];
+ const num=n=>Number(n.toFixed(5)),safe=s=>String(s).replace(/[^\x20-\x7E]/g,'?').replace(/[\\()]/g,'\\$&');
+ let commands=[];
+ function text(x,y,s,size=8,strong=false,color=[.1,.15,.15]){commands.push(`${color.join(' ')} rg BT /${strong?'FB':'FR'} ${size} Tf 1 0 0 1 ${num(x*mm)} ${num(PH-y*mm)} Tm (${safe(s)}) Tj ET`);}
+ function line(x,y,x2,y2,width=.25){commands.push(`0.25 0.3 0.3 RG ${width} w ${num(x*mm)} ${num(PH-y*mm)} m ${num(x2*mm)} ${num(PH-y2*mm)} l S`);}
+ // Whole-cell tiles: 32 columns each, 50/50/48 rows; centered on A4 with margins on all sides.
+ for(let row=0;row<3;row++)for(let col=0;col<3;col++){
+  const cols=32,rows=Math.min(50,148-row*50),x0=9,y0=(297-rows*5)/2;
+  for(let ly=0;ly<rows;ly++)for(let lx=0;lx<cols;lx++){
+   const gx=col*32+lx,gy=row*50+ly,x=x0+lx*6,y=y0+ly*5;
+   const isID=gy<2||gy>=146,id=isID?null:pattern[(gy-2)*96+gx],color=isID?[.88,.89,.87]:rgb[id];
+   commands.push(`${color.join(' ')} rg ${num(x*mm)} ${num(PH-(y+5)*mm)} ${num(6*mm)} ${num(5*mm)} re f`);
+   if(isID){
+    const digit=String(gx+1).padStart(2,'0')[gy%2===0?1:0];
+    commands.push(`0 0 0 rg BT /FB 8 Tf 0 1 -1 0 ${num((x+3)*mm+2.872)} ${num(PH-(y+2.5)*mm-2.224)} Tm (${digit}) Tj ET`);
+   }else{
+    const label=String(id+1),luminance=.2126*color[0]+.7152*color[1]+.0722*color[2],size=6.5;
+    text(x+3-label.length*.556*size/(2*mm),y+2.5+.359*size/mm,label,size,true,luminance>.5?[0,0,0]:[1,1,1]);
+   }
+  }
+  for(let x=0;x<=cols;x++)line(x0+x*6,y0,x0+x*6,y0+rows*5,.2);
+  for(let y=0;y<=rows;y++)line(x0,y0+y*5,x0+cols*6,y0+y*5,.2);
+  text(105-.556*10/(2*mm),289,String(row*3+col+1),10);
+  let data=enc.encode(commands.join('\n')),filter='';
+  if(typeof CompressionStream!=='undefined'){data=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());filter='/Filter /FlateDecode';}
+  const content=add(join([`<< ${filter} /Length ${data.length} >>\nstream\n`,data,'\nendstream']));
+  pages.push(add(`<< /Type /Page /Parent ${root} 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /Font << /FR ${font} 0 R /FB ${bold} 0 R >> >> /Contents ${content} 0 R >>`));commands=[];
+ }
+ objects[catalog]=bytes(`<< /Type /Catalog /Pages ${root} 0 R /ViewerPreferences << /PrintScaling /None >> >>`);
+ objects[root]=bytes(`<< /Type /Pages /Kids [${pages.map(id=>id+' 0 R').join(' ')}] /Count 9 >>`);
+ const parts=[bytes('%PDF-1.4\n%PixelStrand checking template\n')],offsets=[0];let length=parts[0].length;
+ for(let i=1;i<objects.length;i++){offsets[i]=length;const block=join([`${i} 0 obj\n`,objects[i],'\nendobj\n']);parts.push(block);length+=block.length;}
+ const xref=length;parts.push(bytes(`xref\n0 ${objects.length}\n0000000000 65535 f \n`+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objects.length} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+ return new Blob(parts,{type:'application/pdf'});
+}
+$('checkingPDF').onclick=async()=>{
+ if(!indices||!renderMeta||exporting||worker||debounce)return;
+ const snapshot=Uint8Array.from(indices),metadata={...renderMeta};
+ exporting=true;setExports(false);$('checkingPDF').textContent='Preparing 9 full-size A4 tiles…';
+ try{save(await buildCheckingPDF(snapshot,PALETTE,metadata),metadata.name+'-PixelStrand-full-size-checking.pdf');}
+ catch(error){status('Could not create checking PDF: '+error.message,true);}
+ finally{exporting=false;$('checkingPDF').textContent='↓ Full-size checking PDF · 9 A4 tiles';setExports(!!indices&&!!renderMeta&&!worker&&!debounce);}
+};
 
 $('download').onclick=async()=>{
  if(!indices||!renderMeta||exporting)return;
